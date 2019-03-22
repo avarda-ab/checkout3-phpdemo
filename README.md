@@ -1,7 +1,5 @@
 # TODO LIST
 
-+ access token to URL accessToken?=
-
 + update items button accessToken + action = updateItems (refresh page + new action)
 
 + callback support
@@ -9,16 +7,16 @@
 + getStatus call? show formatted json maybe 
 
 
-# Instalation 
+# Installation 
 
-Dependancies:
+Dependencies:
 
 + php 7
 + composer
 
-### Instal Composer and all packages
+### Install Composer and all required packages
 
-Download and install composer from https://getcomposer.org/download/
+Download and install `composer` from https://getcomposer.org/download/
 
 Install all packages required
 
@@ -26,7 +24,7 @@ Install all packages required
 
 ### Change .evn file
 
-Add your testing clientId and clientSecret to `.env` file
+Add your testing `CLIENT_ID` and `CLIENT_SECRET` to `.env` file
 
 ### Run php server locally
 
@@ -35,4 +33,3 @@ From the root directory run
 >$ php -S localhost:8000
 
 Open http://localhost:8000 in your browser
-
