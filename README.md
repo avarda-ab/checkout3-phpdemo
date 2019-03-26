@@ -20,7 +20,7 @@ Download and install `composer` from https://getcomposer.org/download/
 
 Install all packages required
 
->$ php composer install
+>$ php composer.phar install
 
 ### Change .evn file
 

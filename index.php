@@ -17,6 +17,8 @@ $public_url = getenv('PUBLIC_URL');
 $client_id =  getenv('CLIENT_ID');
 $client_secret = getenv('CLIENT_SECRET');
 
+$redirect_url = "$public_url/?accessToken=";
+
 
 // Get merchant access token
 // This token is used as authentication for all further comunication with the checkout api
@@ -79,11 +81,11 @@ $purchase_id = $init_data->purchaseId;
 // Encode session access token so it can be displayed in the URL
 $encoded_access_token = urlencode($session_access_token);
 if (empty($_GET['accessToken'])) {
-    header("Location: http://localhost:8000/?accessToken=$encoded_access_token");
+    header("Location: $redirect_url$encoded_access_token");
     die();
 };
 
-// Update items in the current session 
+// Update items in the current session
 // Merchant has to send merchant access token as an authorization in the POST request header:
 //      Authorization: Bearer <merchant_access_token_here>
 // Merchant has to provide a purchaseId that was obtained after POST call to /api/merchant/initializePayment
@@ -143,7 +145,7 @@ if (!empty($_GET['updateItems'])) {
         window.avardaCheckoutInit({
             "accessToken": "<?php echo (string)$session_access_token ?>",
             "rootElementId": "checkout-form",
-            "redirectUrl": "<?php echo (string)$public_url ?>",
+            "redirectUrl": "<?php echo (string)$redirect_url ?>",
             "styles": {},
             "disableFocus": true,
         });
@@ -153,4 +155,4 @@ if (!empty($_GET['updateItems'])) {
     <button><a href="/">Reset Session Access Token</a></button>
 </body>
 
-</html> 
+</html>
