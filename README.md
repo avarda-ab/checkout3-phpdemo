@@ -1,10 +1,9 @@
 # TODO LIST
 
-+ update items button accessToken + action = updateItems (refresh page + new action)
-
-+ callback support
-
-+ getStatus call? show formatted json maybe 
++ make update items dynamic
++ make the cached forms work in php shop (refreshing page loses data)
++ clean up the code
++ handle payment by merchant
 
 
 # Installation 

@@ -1,4 +1,5 @@
 <?php
+session_start();
 require "vendor/autoload.php";
 
 // Load variables from .env file
@@ -31,7 +32,7 @@ $data = array('clientId' => $client_id, 'clientSecret' => $client_secret);
 
 $options = array(
     'http' => array(
-        'header'  => "Accept: application/json\r\nContent-type: application/json-patch+json\r\n",
+        'header'  => "Content-type: application/json\r\n",
         'method'  => 'POST',
         'content' => json_encode($data)
     )
@@ -43,6 +44,7 @@ if ($result === false) { /* Handle error */ };
 
 $json_data = json_decode($result);
 $merchant_token = $json_data->token;
+$_SESSION['merchant_token'] = $merchant_token;
 
 // Initialize payment in the Checkout
 // Send language, items list and other additional information
@@ -56,7 +58,7 @@ $payment_data = array(
     "language" => "English", "items" => array(array(
         "description" => "Some item",
         "notes" => "",
-        "amount" => 120,
+        "amount" => 50,
         "taxCode" => "20",
         "taxAmount" => 42
     )),
@@ -64,7 +66,7 @@ $payment_data = array(
 
 $opts = array(
     'http' => array(
-        'header'  => "Accept: application/json\r\nContent-type: application/json-patch+json\r\nAuthorization: Bearer $merchant_token\r\n",
+        'header'  => "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n",
         'method'  => 'POST',
         'content' => json_encode($payment_data)
     )
@@ -76,7 +78,7 @@ if ($init_result === false) { /* Handle error */ };
 $init_data = json_decode($init_result);
 $session_access_token = $init_data->jwt;
 $purchase_id = $init_data->purchaseId;
-
+$_SESSION['purchase_id'] = $purchase_id;
 
 // Encode session access token so it can be displayed in the URL
 $encoded_access_token = urlencode($session_access_token);
@@ -107,7 +109,7 @@ if (!empty($_GET['updateItems'])) {
 
     $opts = array(
         'http' => array(
-            'header'  => "Accept: application/json\r\nContent-type: application/json-patch+json\r\nAuthorization: Bearer $merchant_token\r\n",
+            'header'  => "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n",
             'method'  => 'POST',
             'content' => json_encode($update_data)
         )
@@ -153,6 +155,7 @@ if (!empty($_GET['updateItems'])) {
     <hr>
     <!-- Refresh the page restarting the process of authentication and payment initialization, new token will be created for the session -->
     <button><a href="/">Reset Session Access Token</a></button>
+    <button><a href="/getPaymentStatus.php" target="_blank">Get payment status</a></button>
 </body>
 
-</html>
+</html> 
