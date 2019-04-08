@@ -151,9 +151,11 @@ if (!empty($_GET['updateItems'])) {
         // Additional information available here: <https://docs.avarda.com/checkout-3/advanced-topics/external-payments/>
         var handleByMerchantCallback = function(avardaCheckoutInstance) {
             console.log("Handle external payment here");
-
+            
             // Unmount Checkout from page when external payment is handled
             avardaCheckoutInstance.unmount();
+            // Display success message instead of Checkout application
+            document.getElementById("checkout-form").innerHTML = "<br><h2>External payment handled by merchant!</h2><br>";
         }
 
         window.avardaCheckoutInit({
@@ -170,7 +172,7 @@ if (!empty($_GET['updateItems'])) {
     <button><a href="/">Reset Session Access Token</a></button>
     <button><a href="/getPaymentStatus.php" target="_blank">Get payment status</a></button>
     <hr>
-    <button onclick="handleByMerchantCallback(avardaCheckout)">Finish External Payment</button>
+    <button onclick="handleByMerchantCallback(avardaCheckout)">Finish External Payment Manually</button>
 </body>
 
 </html> 
