@@ -64,15 +64,15 @@ $payment_data = array(
     )),
 );
 
-$opts = array(
+$options = array(
     'http' => array(
         'header'  => "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n",
         'method'  => 'POST',
         'content' => json_encode($payment_data)
     )
 );
-$cont  = stream_context_create($opts);
-$init_result = file_get_contents($init_payment_url, false, $cont);
+$context  = stream_context_create($options);
+$init_result = file_get_contents($init_payment_url, false, $context);
 if ($init_result === false) { /* Handle error */ };
 
 $init_data = json_decode($init_result);
@@ -107,15 +107,15 @@ if (!empty($_GET['updateItems'])) {
         )),
     );
 
-    $opts = array(
+    $options = array(
         'http' => array(
             'header'  => "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n",
             'method'  => 'POST',
             'content' => json_encode($update_data)
         )
     );
-    $cont  = stream_context_create($opts);
-    $update_result = file_get_contents($update_items_url, false, $cont);
+    $context  = stream_context_create($options);
+    $update_result = file_get_contents($update_items_url, false, $context);
     if ($update_result === false) { /* Handle error */ };
 
     $update_response = json_decode($update_result);
@@ -144,18 +144,30 @@ if (!empty($_GET['updateItems'])) {
     <!-- Redirect url is neccessary for payment methods that will redirect user to their domain while processing payment (e.g. card payment) -->
     <!-- Additional information available here: <https://docs.avarda.com/?post_type=checkout30&p=1552#showing-the-form> -->
     <script>
+        // Handle external payment methods
+        // Additional information available here: <https://docs.avarda.com/checkout-3/advanced-topics/external-payments/>
+        var handleByMerchantCallback = function(avardaCheckoutInstance) {
+            console.log("Handle external payment here");
+
+            // Unmount Checkout from page when external payment is handled
+            avardaCheckoutInstance.unmount();
+        }
+
         window.avardaCheckoutInit({
             "accessToken": "<?php echo (string)$session_access_token ?>",
             "rootElementId": "checkout-form",
             "redirectUrl": "<?php echo (string)$redirect_url ?>",
             "styles": {},
             "disableFocus": true,
+            "handleByMerchantCallback": handleByMerchantCallback,
         });
     </script>
     <hr>
     <!-- Refresh the page restarting the process of authentication and payment initialization, new token will be created for the session -->
     <button><a href="/">Reset Session Access Token</a></button>
     <button><a href="/getPaymentStatus.php" target="_blank">Get payment status</a></button>
+    <hr>
+    <button onclick="handleByMerchantCallback(avardaCheckout)">Finish External Payment</button>
 </body>
 
 </html> 

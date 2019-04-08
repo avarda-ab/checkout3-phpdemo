@@ -18,15 +18,15 @@ $purchase_id = $_SESSION['purchase_id'];
 $payment_status_url = "$api_url/api/merchant/getPaymentStatus";
 $payment_data = array("purchaseId" => $purchase_id);
 
-$opts = array(
+$options = array(
     'http' => array(
         'header'  => "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n",
         'method'  => 'POST',
         'content' => json_encode($payment_data)
     )
 );
-$cont  = stream_context_create($opts);
-$payment_status_result = file_get_contents($payment_status_url, false, $cont);
+$context  = stream_context_create($options);
+$payment_status_result = file_get_contents($payment_status_url, false, $context);
 ?>
 
 <!doctype html>
@@ -43,10 +43,10 @@ $payment_status_result = file_get_contents($payment_status_url, false, $cont);
     <h1> Payment status for <?php echo (string)$purchase_id ?></h1>
     <?php 
     if ($payment_status_result === false) { /* Handle error */ } else {
-        $payment_status_response = json_decode($payment_status_result, true);
-        print '<pre>';
-        print_r($payment_status_response);
-        print '</pre>';
+        $payment_status_response = json_decode($payment_status_result, JSON_PRETTY_PRINT);
+        echo "<pre>";
+        echo json_encode($payment_status_response, JSON_PRETTY_PRINT);
+        echo "</pre>";
     };
     ?>
     <hr>

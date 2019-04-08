@@ -3,8 +3,6 @@
 + make update items dynamic
 + make the cached forms work in php shop (refreshing page loses data)
 + clean up the code
-+ handle payment by merchant
-
 
 # Installation 
 
