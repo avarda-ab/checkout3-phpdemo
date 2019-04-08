@@ -21,72 +21,75 @@ $client_secret = getenv('CLIENT_SECRET');
 $redirect_url = "$public_url/?accessToken=";
 
 
-// Get merchant access token
-// This token is used as authentication for all further comunication with the checkout api
-// This token should never be displayed to the user or sent to the frontend of the application
-// CLIENT_ID and CLIENT_SECRET is used for generating a merchant access token
-// POST request is sent to '/api/merchant/accessToken'
-// Additional info can be found in the documentation here: <https://docs.avarda.com/?post_type=checkout30&p=1552#accessToken-obtaining>
-$access_token_url = "$api_url/api/merchant/accessToken";
-$data = array('clientId' => $client_id, 'clientSecret' => $client_secret);
-
-$options = array(
-    'http' => array(
-        'header'  => "Content-type: application/json\r\n",
-        'method'  => 'POST',
-        'content' => json_encode($data)
-    )
-);
-
-$context  = stream_context_create($options);
-$result = file_get_contents($access_token_url, false, $context);
-if ($result === false) { /* Handle error */ };
-
-$json_data = json_decode($result);
-$merchant_token = $json_data->token;
-$_SESSION['merchant_token'] = $merchant_token;
-
-// Initialize payment in the Checkout
-// Send language, items list and other additional information
-// Exhaustive list of all possibilities available here: <https://docs.avarda.com/?post_type=checkout30&p=1552#initialize-payment>
-// Merchant has to send merchant access token as an authorization in the POST request header:
-//      Authorization: Bearer <merchant_access_token_here>
-// Successfull initialization returns unique JWT session access token and purchase ID
-// Session access token is used to display checkout form on the frontend for the current session
-$init_payment_url = "$api_url/api/merchant/initializePayment";
-$payment_data = array(
-    "language" => "English", "items" => array(array(
-        "description" => "Some item",
-        "notes" => "",
-        "amount" => 50,
-        "taxCode" => "20",
-        "taxAmount" => 42
-    )),
-);
-
-$options = array(
-    'http' => array(
-        'header'  => "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n",
-        'method'  => 'POST',
-        'content' => json_encode($payment_data)
-    )
-);
-$context  = stream_context_create($options);
-$init_result = file_get_contents($init_payment_url, false, $context);
-if ($init_result === false) { /* Handle error */ };
-
-$init_data = json_decode($init_result);
-$session_access_token = $init_data->jwt;
-$purchase_id = $init_data->purchaseId;
-$_SESSION['purchase_id'] = $purchase_id;
-
-// Encode session access token so it can be displayed in the URL
-$encoded_access_token = urlencode($session_access_token);
 if (empty($_GET['accessToken'])) {
-    header("Location: $redirect_url$encoded_access_token");
-    die();
-};
+    // Get merchant access token
+    // This token is used as authentication for all further comunication with the checkout api
+    // This token should never be displayed to the user or sent to the frontend of the application
+    // CLIENT_ID and CLIENT_SECRET is used for generating a merchant access token
+    // POST request is sent to '/api/merchant/accessToken'
+    // Additional info can be found in the documentation here: <https://docs.avarda.com/?post_type=checkout30&p=1552#accessToken-obtaining>
+    $access_token_url = "$api_url/api/merchant/accessToken";
+    $data = array('clientId' => $client_id, 'clientSecret' => $client_secret);
 
+    $options = array(
+        'http' => array(
+            'header'  => "Content-type: application/json\r\n",
+            'method'  => 'POST',
+            'content' => json_encode($data)
+        )
+    );
+
+    $context  = stream_context_create($options);
+    $result = file_get_contents($access_token_url, false, $context);
+    if ($result === false) { /* Handle error */ };
+
+    $json_data = json_decode($result);
+    $merchant_token = $json_data->token;
+    $_SESSION['merchant_token'] = $merchant_token;
+
+    // Initialize payment in the Checkout
+    // Send language, items list and other additional information
+    // Exhaustive list of all possibilities available here: <https://docs.avarda.com/?post_type=checkout30&p=1552#initialize-payment>
+    // Merchant has to send merchant access token as an authorization in the POST request header:
+    //      Authorization: Bearer <merchant_access_token_here>
+    // Successfull initialization returns unique JWT session access token and purchase ID
+    // Session access token is used to display checkout form on the frontend for the current session
+    $init_payment_url = "$api_url/api/merchant/initializePayment";
+    $payment_data = array(
+        "language" => "English", "items" => array(array(
+            "description" => "Some item",
+            "notes" => "",
+            "amount" => 50,
+            "taxCode" => "20",
+            "taxAmount" => 42
+        )),
+    );
+
+    $options = array(
+        'http' => array(
+            'header'  => "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n",
+            'method'  => 'POST',
+            'content' => json_encode($payment_data)
+        )
+    );
+    $context  = stream_context_create($options);
+    $init_result = file_get_contents($init_payment_url, false, $context);
+    if ($init_result === false) { /* Handle error */ };
+
+    $init_data = json_decode($init_result);
+    $session_access_token = $init_data->jwt;
+    $_SESSION['session_access_token'] = $session_access_token;
+    $purchase_id = $init_data->purchaseId;
+    $_SESSION['purchase_id'] = $purchase_id;
+
+    // Encode session access token so it can be displayed in the URL
+    $encoded_access_token = urlencode($session_access_token);
+    $_SESSION['encoded_access_token'] = $encoded_access_token;
+    if (empty($_GET['accessToken'])) {
+        header("Location: $redirect_url$encoded_access_token");
+        die();
+    };
+}
 // Update items in the current session
 // Merchant has to send merchant access token as an authorization in the POST request header:
 //      Authorization: Bearer <merchant_access_token_here>
@@ -98,7 +101,7 @@ if (!empty($_GET['updateItems'])) {
 
     $update_items_url = "$api_url/api/merchant/updateItems";
     $update_data = array(
-        "purchaseId" => $purchase_id, "items" => array(array(
+        "purchaseId" => $_SESSION['purchase_id'], "items" => array(array(
             "description" => "Some item",
             "notes" => "",
             "amount" => (int)$update_amount,
@@ -109,7 +112,7 @@ if (!empty($_GET['updateItems'])) {
 
     $options = array(
         'http' => array(
-            'header'  => "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n",
+            'header'  => "Content-type: application/json\r\nAuthorization: Bearer " . $_SESSION['merchant_token'] . "\r\n",
             'method'  => 'POST',
             'content' => json_encode($update_data)
         )
@@ -134,7 +137,7 @@ if (!empty($_GET['updateItems'])) {
 
 <body>
     <h1>AVARDA - PHP Integration Demo</h1>
-    <button><a href="/?accessToken=<?php echo (string)$encoded_access_token ?>&updateItems=1">Update Items</a></button>
+    <button><a href="/?accessToken=<?php echo (string)$_SESSION['encoded_access_token'] ?>&updateItems=1">Update Items</a></button>
     <!-- Checkout form will be displayed in a <div> with a custom unique ID, this ID is passed on in the checkout app initialization -->
     <div id="checkout-form"></div>
     <!-- Include one script with all neccessary JS code for the checkout app in your source code -->
@@ -154,7 +157,7 @@ if (!empty($_GET['updateItems'])) {
         }
 
         window.avardaCheckoutInit({
-            "accessToken": "<?php echo (string)$session_access_token ?>",
+            "accessToken": "<?php echo (string)$_SESSION['session_access_token'] ?>",
             "rootElementId": "checkout-form",
             "redirectUrl": "<?php echo (string)$redirect_url ?>",
             "styles": {},

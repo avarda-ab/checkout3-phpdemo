@@ -1,8 +1,8 @@
 # TODO LIST
-
-+ make update items dynamic
-+ make the cached forms work in php shop (refreshing page loses data)
 + clean up the code
+    + function for POST request
+    + function for each step of the flow (get_access_token;initialize_payment,...)
++ disclaimer
 
 # Installation 
 
