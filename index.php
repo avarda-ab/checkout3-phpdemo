@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "vendor/autoload.php";
+require "utils.php";
 
 // Load variables from .env file
 // Environment variables have to be passed to the application in order to authenticate, initilize payment and show the checkout app on the frontend
@@ -20,42 +21,32 @@ $client_secret = getenv('CLIENT_SECRET');
 
 $redirect_url = "$public_url/?accessToken=";
 
-
 if (empty($_GET['accessToken'])) {
     // Get merchant access token
     // This token is used as authentication for all further comunication with the checkout api
     // This token should never be displayed to the user or sent to the frontend of the application
     // CLIENT_ID and CLIENT_SECRET is used for generating a merchant access token
     // POST request is sent to '/api/merchant/accessToken'
-    // Additional info can be found in the documentation here: <https://docs.avarda.com/?post_type=checkout30&p=1552#accessToken-obtaining>
-    $access_token_url = "$api_url/api/merchant/accessToken";
-    $data = array('clientId' => $client_id, 'clientSecret' => $client_secret);
-
-    $options = array(
-        'http' => array(
-            'header'  => "Content-type: application/json\r\n",
-            'method'  => 'POST',
-            'content' => json_encode($data)
-        )
-    );
-
-    $context  = stream_context_create($options);
-    $result = file_get_contents($access_token_url, false, $context);
-    if ($result === false) { /* Handle error */ };
-
-    $json_data = json_decode($result);
-    $merchant_token = $json_data->token;
+    // Additional info can be found in the documentation here: <docs.avarda.com/checkout-3/how-to-get-started/#obtain-merchant-access-token>
+    $request_url = "$api_url/api/merchant/accessToken";
+    $request_header = "Content-type: application/json\r\n";
+    $request_payload = array('clientId' => $client_id, 'clientSecret' => $client_secret);
+    $get_access_token_result = send_post_request($request_url, $request_header, $request_payload);
+    if ($get_access_token_result === false) { /* Handle error */ };
+    $data = json_decode($get_access_token_result);
+    $merchant_token = $data->token;
     $_SESSION['merchant_token'] = $merchant_token;
 
     // Initialize payment in the Checkout
     // Send language, items list and other additional information
-    // Exhaustive list of all possibilities available here: <https://docs.avarda.com/?post_type=checkout30&p=1552#initialize-payment>
+    // Exhaustive list of all possibilities available here: <https://docs.avarda.com/checkout-3/how-to-get-started/#initialize-payment>
     // Merchant has to send merchant access token as an authorization in the POST request header:
     //      Authorization: Bearer <merchant_access_token_here>
     // Successfull initialization returns unique JWT session access token and purchase ID
     // Session access token is used to display checkout form on the frontend for the current session
-    $init_payment_url = "$api_url/api/merchant/initializePayment";
-    $payment_data = array(
+    $request_url = "$api_url/api/merchant/initializePayment";
+    $request_header = "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n";
+    $request_payload = array(
         "language" => "English", "items" => array(array(
             "description" => "Some item",
             "notes" => "",
@@ -64,43 +55,35 @@ if (empty($_GET['accessToken'])) {
             "taxAmount" => 42
         )),
     );
-
-    $options = array(
-        'http' => array(
-            'header'  => "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n",
-            'method'  => 'POST',
-            'content' => json_encode($payment_data)
-        )
-    );
-    $context  = stream_context_create($options);
-    $init_result = file_get_contents($init_payment_url, false, $context);
-    if ($init_result === false) { /* Handle error */ };
-
-    $init_data = json_decode($init_result);
-    $session_access_token = $init_data->jwt;
+    $initialize_payment_result = send_post_request($request_url, $request_header, $request_payload);
+    if ($initialize_payment_result === false) { /* Handle error */ };
+    $data = json_decode($initialize_payment_result);
+    $session_access_token = $data->jwt;
     $_SESSION['session_access_token'] = $session_access_token;
-    $purchase_id = $init_data->purchaseId;
+    $purchase_id = $data->purchaseId;
     $_SESSION['purchase_id'] = $purchase_id;
 
     // Encode session access token so it can be displayed in the URL
     $encoded_access_token = urlencode($session_access_token);
     $_SESSION['encoded_access_token'] = $encoded_access_token;
     if (empty($_GET['accessToken'])) {
-        header("Location: $redirect_url$encoded_access_token");
+        header("Location: $redirect_url $encoded_access_token");
         die();
     };
-}
+};
+
 // Update items in the current session
 // Merchant has to send merchant access token as an authorization in the POST request header:
 //      Authorization: Bearer <merchant_access_token_here>
 // Merchant has to provide a purchaseId that was obtained after POST call to /api/merchant/initializePayment
 // in order to send a new list of items
+// More information can be found here: <https://docs.avarda.com/checkout-3/more-features/update-items/>
 if (!empty($_GET['updateItems'])) {
     $update_amount = rand(10, 500);
     $tax_amount = $update_amount * 0.2;
-
-    $update_items_url = "$api_url/api/merchant/updateItems";
-    $update_data = array(
+    $request_url = "$api_url/api/merchant/updateItems";
+    $request_header = "Content-type: application/json\r\nAuthorization: Bearer " . $_SESSION['merchant_token'] . "\r\n";
+    $request_payload = array(
         "purchaseId" => $_SESSION['purchase_id'], "items" => array(array(
             "description" => "Some item",
             "notes" => "",
@@ -109,20 +92,10 @@ if (!empty($_GET['updateItems'])) {
             "taxAmount" => (int)$tax_amount
         )),
     );
-
-    $options = array(
-        'http' => array(
-            'header'  => "Content-type: application/json\r\nAuthorization: Bearer " . $_SESSION['merchant_token'] . "\r\n",
-            'method'  => 'POST',
-            'content' => json_encode($update_data)
-        )
-    );
-    $context  = stream_context_create($options);
-    $update_result = file_get_contents($update_items_url, false, $context);
-    if ($update_result === false) { /* Handle error */ };
-
-    $update_response = json_decode($update_result);
-}
+    $update_items_result = send_post_request($request_url, $request_header, $request_payload);
+    if ($update_items_result === false) { /* Handle error */ };
+    $data = json_decode($update_items_result);
+};
 ?>
 
 <!doctype html>
@@ -145,13 +118,13 @@ if (!empty($_GET['updateItems'])) {
     <!-- During the initialization of the checkout app, additional flags can be passed to change appearance or behaviour of the app -->
     <!-- Session access token is passed and required -->
     <!-- Redirect url is neccessary for payment methods that will redirect user to their domain while processing payment (e.g. card payment) -->
-    <!-- Additional information available here: <https://docs.avarda.com/?post_type=checkout30&p=1552#showing-the-form> -->
+    <!-- Additional information available here: <docs.avarda.com/checkout-3/embed-checkout/#showing-the-form> -->
     <script>
         // Handle external payment methods
-        // Additional information available here: <https://docs.avarda.com/checkout-3/advanced-topics/external-payments/>
+        // Additional information available here: <https://docs.avarda.com/checkout-3/more-features/external-payments/>
         var handleByMerchantCallback = function(avardaCheckoutInstance) {
             console.log("Handle external payment here");
-            
+
             // Unmount Checkout from page when external payment is handled
             avardaCheckoutInstance.unmount();
             // Display success message instead of Checkout application
@@ -175,4 +148,4 @@ if (!empty($_GET['updateItems'])) {
     <button onclick="handleByMerchantCallback(avardaCheckout)">Finish External Payment Manually</button>
 </body>
 
-</html> 
+</html>

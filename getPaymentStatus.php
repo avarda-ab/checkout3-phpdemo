@@ -1,6 +1,7 @@
-<?php 
+<?php
 session_start();
 require "vendor/autoload.php";
+require "utils.php";
 
 $dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
@@ -15,18 +16,16 @@ $api_url = getenv('CHECKOUT3_BACKEND_API_URL');
 $merchant_token = $_SESSION['merchant_token'];
 $purchase_id = $_SESSION['purchase_id'];
 
-$payment_status_url = "$api_url/api/merchant/getPaymentStatus";
-$payment_data = array("purchaseId" => $purchase_id);
-
-$options = array(
-    'http' => array(
-        'header'  => "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n",
-        'method'  => 'POST',
-        'content' => json_encode($payment_data)
-    )
-);
-$context  = stream_context_create($options);
-$payment_status_result = file_get_contents($payment_status_url, false, $context);
+// Get payment status by purchase ID 
+// Send purchase ID to /api/merchant/getPaymentStatus
+// More info available here: <https://docs.avarda.com/checkout-3/confirmation/#get-payment-status>
+// Merchant has to send merchant access token as an authorization in the POST request heeader
+//      Authorization: Bearer <merchant_access_token_here>
+// Successful request returns information about the payment
+$request_url = "$api_url/api/merchant/getPaymentStatus";
+$request_header = "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n";
+$request_payload = array("purchaseId" => $purchase_id);
+$payment_status_result = send_post_request($request_url, $request_header, $request_payload)
 ?>
 
 <!doctype html>
@@ -34,14 +33,14 @@ $payment_status_result = file_get_contents($payment_status_url, false, $context)
 
 <head>
     <meta charset="utf-8">
-    <title>AVARDA - PHP Integration Demo - Payment Status</title>
+    <title>AVARDA - PHP Integration Demo - Get Payment Status</title>
     <meta name="description" content="DemoShop">
     <meta name="author" content="Avarda">
 </head>
 
 <body>
     <h1> Payment status for <?php echo (string)$purchase_id ?></h1>
-    <?php 
+    <?php
     if ($payment_status_result === false) { /* Handle error */ } else {
         $payment_status_response = json_decode($payment_status_result, JSON_PRETTY_PRINT);
         echo "<pre>";
@@ -53,4 +52,4 @@ $payment_status_result = file_get_contents($payment_status_url, false, $context)
     <button><a href="/getPaymentStatus.php">Refresh Payment Status</a></button>
 </body>
 
-</html> 
+</html>
