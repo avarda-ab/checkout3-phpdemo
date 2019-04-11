@@ -1,6 +1,5 @@
 # TODO LIST
 + clean up the code
-    + function for POST request
     + function for each step of the flow (get_access_token;initialize_payment,...)
 + disclaimer
 

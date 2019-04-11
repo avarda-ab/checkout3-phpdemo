@@ -4,7 +4,7 @@
  *
  * Uses `file_get_contents()` to send a POST request, takes request url, header and payload as arguments
  *
- * @link https://www.php.net/manual/en/function.file-get-contents.php
+ * @see https://www.php.net/manual/en/function.file-get-contents.php
  *
  * @param string $request_url
  * @param string $request_header 
