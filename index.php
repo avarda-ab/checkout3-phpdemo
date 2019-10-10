@@ -120,6 +120,14 @@ if (!empty($_GET['updateItems'])) {
     <!-- Redirect url is neccessary for payment methods that will redirect user to their domain while processing payment (e.g. card payment) -->
     <!-- Additional information available here: <docs.avarda.com/checkout-3/embed-checkout/#showing-the-form> -->
     <script>
+        (function(e,t,n,a,s,c,o,i,r){e[a]=e[a]||function(){(e[a].q=e[a].q||[
+        ]).push(arguments)};e[a].i=s;i=t.createElement(n);i.async=1
+        ;i.src=o+"?v="+c+"&ts="+1*new Date;r=t.getElementsByTagName(n)[0]
+        ;r.parentNode.insertBefore(i,r)})(window,document,"script",
+        "avardaCheckoutInit","avardaCheckout","1.0.0",
+        "https://avdonl-t-checkout-frontend.azurewebsites.net/static/js/main.js"
+        );
+        
         // Handle external payment methods
         // Additional information available here: <https://docs.avarda.com/checkout-3/more-features/external-payments/>
         var handleByMerchantCallback = function(avardaCheckoutInstance) {
