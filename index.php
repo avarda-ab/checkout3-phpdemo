@@ -113,8 +113,6 @@ if (!empty($_GET['updateItems'])) {
     <button><a href="/?accessToken=<?php echo (string)$_SESSION['encoded_access_token'] ?>&updateItems=1">Update Items</a></button>
     <!-- Checkout form will be displayed in a <div> with a custom unique ID, this ID is passed on in the checkout app initialization -->
     <div id="checkout-form"></div>
-    <!-- Include one script with all neccessary JS code for the checkout app in your source code -->
-    <script src="<?php echo (string)$checkout3_js_bundle ?>"></script>
     <!-- During the initialization of the checkout app, additional flags can be passed to change appearance or behaviour of the app -->
     <!-- Session access token is passed and required -->
     <!-- Redirect url is neccessary for payment methods that will redirect user to their domain while processing payment (e.g. card payment) -->
@@ -125,7 +123,7 @@ if (!empty($_GET['updateItems'])) {
         ;i.src=o+"?v="+c+"&ts="+1*new Date;r=t.getElementsByTagName(n)[0]
         ;r.parentNode.insertBefore(i,r)})(window,document,"script",
         "avardaCheckoutInit","avardaCheckout","1.0.0",
-        "https://avdonl-t-checkout-frontend.azurewebsites.net/static/js/main.js"
+        "<?php echo (string)$checkout3_js_bundle ?>"
         );
         
         // Handle external payment methods
