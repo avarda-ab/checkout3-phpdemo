@@ -19,7 +19,7 @@ $purchase_id = $_SESSION['purchase_id'];
 // Get payment status by purchase ID 
 // Send purchase ID to /api/merchant/getPaymentStatus
 // More info available here: <https://docs.avarda.com/checkout-3/confirmation/#get-payment-status>
-// Merchant has to send merchant access token as an authorization in the POST request heeader
+// Merchant has to send merchant access token as an authorization in the POST request header
 //      Authorization: Bearer <merchant_access_token_here>
 // Successful request returns information about the payment
 $request_url = "$api_url/api/merchant/getPaymentStatus";

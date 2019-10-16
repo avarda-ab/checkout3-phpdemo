@@ -4,7 +4,8 @@ require "vendor/autoload.php";
 require "utils.php";
 
 // Load variables from .env file
-// Environment variables have to be passed to the application in order to authenticate, initilize payment and show the checkout app on the frontend
+// Environment variables have to be passed to the application in order to authenticate
+// Initialize payment and show the checkout app on the frontend
 $dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
 $dotenv->required('CLIENT_ID')->notEmpty();
@@ -23,11 +24,12 @@ $redirect_url = "$public_url/?accessToken=";
 
 if (empty($_GET['accessToken'])) {
     // Get merchant access token
-    // This token is used as authentication for all further comunication with the checkout api
+    // This token is used as authentication for all further communication with the checkout api
     // This token should never be displayed to the user or sent to the frontend of the application
     // CLIENT_ID and CLIENT_SECRET is used for generating a merchant access token
     // POST request is sent to '/api/merchant/accessToken'
-    // Additional info can be found in the documentation here: <docs.avarda.com/checkout-3/how-to-get-started/#obtain-merchant-access-token>
+    // Additional info can be found in the documentation here: 
+    // <docs.avarda.com/checkout-3/how-to-get-started/#obtain-merchant-access-token>
     $request_url = "$api_url/api/merchant/accessToken";
     $request_header = "Content-type: application/json\r\n";
     $request_payload = array('clientId' => $client_id, 'clientSecret' => $client_secret);
@@ -39,10 +41,11 @@ if (empty($_GET['accessToken'])) {
 
     // Initialize payment in the Checkout
     // Send language, items list and other additional information
-    // Exhaustive list of all possibilities available here: <https://docs.avarda.com/checkout-3/how-to-get-started/#initialize-payment>
+    // Exhaustive list of all possibilities available here: 
+    // <https://docs.avarda.com/checkout-3/how-to-get-started/#initialize-payment>
     // Merchant has to send merchant access token as an authorization in the POST request header:
     //      Authorization: Bearer <merchant_access_token_here>
-    // Successfull initialization returns unique JWT session access token and purchase ID
+    // Successful initialization returns unique JWT session access token and purchase ID
     // Session access token is used to display checkout form on the frontend for the current session
     $request_url = "$api_url/api/merchant/initializePayment";
     $request_header = "Content-type: application/json\r\nAuthorization: Bearer $merchant_token\r\n";
@@ -77,7 +80,8 @@ if (empty($_GET['accessToken'])) {
 //      Authorization: Bearer <merchant_access_token_here>
 // Merchant has to provide a purchaseId that was obtained after POST call to /api/merchant/initializePayment
 // in order to send a new list of items
-// More information can be found here: <https://docs.avarda.com/checkout-3/more-features/update-items/>
+// More information can be found here: 
+// <https://docs.avarda.com/checkout-3/more-features/update-items/>
 if (!empty($_GET['updateItems'])) {
     $update_amount = rand(10, 500);
     $tax_amount = $update_amount * 0.2;
@@ -115,8 +119,9 @@ if (!empty($_GET['updateItems'])) {
     <div id="checkout-form"></div>
     <!-- During the initialization of the checkout app, additional flags can be passed to change appearance or behaviour of the app -->
     <!-- Session access token is passed and required -->
-    <!-- Redirect url is neccessary for payment methods that will redirect user to their domain while processing payment (e.g. card payment) -->
-    <!-- Additional information available here: <docs.avarda.com/checkout-3/embed-checkout/#showing-the-form> -->
+    <!-- Redirect url is necessary for payment methods that will redirect user to their domain while processing payment (e.g. card payment) -->
+    <!-- Additional information available here: -->
+    <!-- <docs.avarda.com/checkout-3/embed-checkout/#showing-the-form> -->
     <script>
         (function(e,t,n,a,s,c,o,i,r){e[a]=e[a]||function(){(e[a].q=e[a].q||[
         ]).push(arguments)};e[a].i=s;i=t.createElement(n);i.async=1
@@ -130,7 +135,7 @@ if (!empty($_GET['updateItems'])) {
         var handleByMerchantCallback = function(avardaCheckoutInstance) {
             console.log("Handle external payment here");
 
-            // Unmount Checkout from page when external payment is handled
+            // Un-mount Checkout from page when external payment is handled
             avardaCheckoutInstance.unmount();
             // Display success message instead of Checkout application
             document.getElementById("checkout-form").innerHTML = "<br><h2>External payment handled by merchant!</h2><br>";
