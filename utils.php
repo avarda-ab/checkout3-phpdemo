@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Send a POST Request
  *
@@ -11,7 +12,8 @@
  * @param array $request_payload
  * @return string
  */
-function send_post_request($request_url, $request_header, $request_payload) {
+function send_post_request($request_url, $request_header, $request_payload)
+{
     $options = array(
         'http' => array(
             'header'  => $request_header,

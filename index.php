@@ -87,9 +87,9 @@ if (!empty($_GET['updateItems'])) {
         "purchaseId" => $_SESSION['purchase_id'], "items" => array(array(
             "description" => "Some item",
             "notes" => "",
-            "amount" => (int)$update_amount,
+            "amount" => (int) $update_amount,
             "taxCode" => "20",
-            "taxAmount" => (int)$tax_amount
+            "taxAmount" => (int) $tax_amount
         )),
     );
     $update_items_result = send_post_request($request_url, $request_header, $request_payload);
@@ -110,7 +110,7 @@ if (!empty($_GET['updateItems'])) {
 
 <body>
     <h1>AVARDA - PHP Integration Demo</h1>
-    <button><a href="/?accessToken=<?php echo (string)$_SESSION['encoded_access_token'] ?>&updateItems=1">Update Items</a></button>
+    <button><a href="/?accessToken=<?php echo (string) $_SESSION['encoded_access_token'] ?>&updateItems=1">Update Items</a></button>
     <!-- Checkout form will be displayed in a <div> with a custom unique ID, this ID is passed on in the checkout app initialization -->
     <div id="checkout-form"></div>
     <!-- During the initialization of the checkout app, additional flags can be passed to change appearance or behaviour of the app -->
@@ -125,7 +125,6 @@ if (!empty($_GET['updateItems'])) {
         "avardaCheckoutInit","avardaCheckout","1.0.0",
         "<?php echo (string)$checkout3_js_bundle ?>"
         );
-        
         // Handle external payment methods
         // Additional information available here: <https://docs.avarda.com/checkout-3/more-features/external-payments/>
         var handleByMerchantCallback = function(avardaCheckoutInstance) {
@@ -138,9 +137,9 @@ if (!empty($_GET['updateItems'])) {
         }
 
         window.avardaCheckoutInit({
-            "accessToken": "<?php echo (string)$_SESSION['session_access_token'] ?>",
+            "accessToken": "<?php echo (string) $_SESSION['session_access_token'] ?>",
             "rootElementId": "checkout-form",
-            "redirectUrl": "<?php echo (string)$redirect_url ?>",
+            "redirectUrl": "<?php echo (string) $redirect_url ?>",
             "styles": {},
             "disableFocus": true,
             "handleByMerchantCallback": handleByMerchantCallback,

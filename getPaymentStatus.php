@@ -39,7 +39,7 @@ $payment_status_result = send_post_request($request_url, $request_header, $reque
 </head>
 
 <body>
-    <h1> Payment status for <?php echo (string)$purchase_id ?></h1>
+    <h1> Payment status for <?php echo (string) $purchase_id ?></h1>
     <?php
     if ($payment_status_result === false) { /* Handle error */ } else {
         $payment_status_response = json_decode($payment_status_result, JSON_PRETTY_PRINT);
