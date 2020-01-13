@@ -1,6 +1,6 @@
 # Disclaimer
 
-**All code examples are for Demo purposes only. Source code covers basic and simple integration of Checkout3 in PHP with comments and links to the official public documentation. This code is not production-ready and should not be used in any production environment.**
+**All code examples are for Demo purposes only. Source code covers basic and simple integration of Checkout 3.0 in PHP with comments and links to the official public documentation. This code is not production-ready and should not be used in any production environment.**
 
 # Installation
 
