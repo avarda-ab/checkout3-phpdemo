@@ -203,7 +203,7 @@ if (!empty($_GET['redirected'])) {
         }
 
         window.avardaCheckoutInit({
-            "accessToken": "<?php echo (string) $_SESSION['purchase_JWT_token'] ?>",
+            "purchaseJwt": "<?php echo (string) $_SESSION['purchase_JWT_token'] ?>",
             "rootElementId": "checkout-form",
             "redirectUrl": "<?php echo (string) ("$public_url/?redirected=1&purchaseId=" . $_SESSION['purchaseId']) ?>",
             "styles": {},
