@@ -205,7 +205,7 @@ if (!empty($_GET['redirected'])) {
         var completedPurchaseCallback = function(avardaCheckoutInstance) {
             console.log("Purchase Completed Successfully - Handle here!")
 
-            // Un-mount Checkout 3.0 frontend app from the page when external payment is handled
+            // Un-mount Checkout 3.0 frontend app from the page
             avardaCheckoutInstance.unmount();
             // Display success message instead of Checkout 3.0 frontend application
             document.getElementById("checkout-form").innerHTML = "<br><h2>Purchase Completed Successfully!</h2><br>";
@@ -214,7 +214,7 @@ if (!empty($_GET['redirected'])) {
         var sessionTimedOutCallback = function(avardaCheckoutInstance) {
             console.log("Session Timed Out - Handle here!")
 
-            // Un-mount Checkout 3.0 frontend app from the page when external payment is handled
+            // Un-mount Checkout 3.0 frontend app from the page
             avardaCheckoutInstance.unmount();
             // Display success message instead of Checkout 3.0 frontend application
             document.getElementById("checkout-form").innerHTML = "<br><h2>Session Timed Out - handled by partner!</h2><br>";
