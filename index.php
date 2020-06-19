@@ -60,7 +60,7 @@ if (empty($_GET['purchaseId'])) {
     //      - refunds,
     //      - cancels,
     //      - returns, etc.
-    $request_url = "$api_url/api/partner/payments";
+    $request_url = "$api_url/api/partner/payments/legacy";
     $request_header = "Content-type: application/json\r\nAuthorization: Bearer $partner_access_token\r\n";
     $request_payload = array(
         "language" => "English", "items" => array(array(
