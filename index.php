@@ -6,7 +6,7 @@ require "utils.php";
 // Load variables from .env file
 // Environment variables have to be passed to the application in order to authenticate
 // initialize payment and show the Checkout 3.0 frontend app
-$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv = Dotenv\Dotenv::create(__DIR__, '.env.local');
 $dotenv->load();
 $dotenv->required('CLIENT_ID')->notEmpty();
 $dotenv->required('CLIENT_SECRET')->notEmpty();
@@ -28,7 +28,7 @@ if (empty($_GET['purchaseId'])) {
     // Send CLIENT_ID and CLIENT_SECRET as JSON payload
     // POST request `/api/partner/tokens`
     // Additional info can be found in the documentation here:
-    // <https://docs.avarda.com/checkout-3/how-to-get-started/#obtain-partner-access-token>
+    // <https://docs.avarda.com/checkout-3/getting-started/#obtain-partner-access-token>
     $request_url = "$api_url/api/partner/tokens";
     $request_header = "Content-type: application/json";
     $request_payload = array("ClientID" => $client_id, "ClientSecret" => $client_secret);
@@ -45,7 +45,7 @@ if (empty($_GET['purchaseId'])) {
     // Initialize payment in the Checkout 3.0
     // Send language, items list and other additional information...
     // Exhaustive list of all possibilities available here:
-    // <https://docs.avarda.com/checkout-3/how-to-get-started/#initialize-payment>
+    // <https://docs.avarda.com/checkout-3/getting-started/#initialize-payment>
     // Partner has to send "Partner access token" as an authorization in the POST request header:
     //      Authorization: Bearer <partner_access_token_here>
     // Successful initialization returns unique "Purchase JWT token" and "PurchaseId"
@@ -54,7 +54,7 @@ if (empty($_GET['purchaseId'])) {
     //      GET request to `/api/partner/payments/<purchaseId_here>/token`
     //      Authorization: Bearer <partner_access_token_here>
     // More info about re-claiming "Purchase JWT token" here:
-    // <https://docs.avarda.com/checkout-3/how-to-get-started>
+    // <https://docs.avarda.com/checkout-3/getting-started/>
     // "PurchaseId" is ID for partner API calls:
     //      - getting payment status,
     //      - refunds,
@@ -139,7 +139,7 @@ if (!empty($_GET['redirected'])) {
     //      GET request to `/api/partner/payments/<purchaseId_here>/token`
     //      Authorization: Bearer <partner_access_token_here>
     // More info about re-claiming "Purchase JWT token" here:
-    // <https://docs.avarda.com/checkout-3/how-to-get-started>
+    // <https://docs.avarda.com/checkout-3/getting-started/>
     // Using GET query parameter "redirected" for demo purposes
     // External payment gate redirects user to "redirectUrl" provided by partner in Checkout 3.0 FE initialization
     // This is not required in case "Purchase JWT token" is stored by partner

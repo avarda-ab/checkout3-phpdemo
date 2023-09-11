@@ -6,7 +6,7 @@
 
 Dependencies:
 
-- php 7
+- php 8
 - composer
 
 ### Install Composer and all required packages
