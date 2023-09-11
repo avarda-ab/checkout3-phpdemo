@@ -3,7 +3,7 @@ session_start();
 require "vendor/autoload.php";
 require "utils.php";
 
-$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv = Dotenv\Dotenv::create(__DIR__, '.env.local');
 $dotenv->load();
 $dotenv->required('CLIENT_ID')->notEmpty();
 $dotenv->required('CLIENT_SECRET')->notEmpty();
